@@ -1,0 +1,24 @@
+<% include ../partials/header %>
+
+<article class="card-body mx-auto" style="max-width: 400px;">
+    <h4 class="card-title mt-3 text-center">Create a New Campground</h4>
+
+    <form action="/campgrounds" method="POST">
+        <div class="card bg-light">
+            <div class="form-group input-group">
+                <input name="name" class="form-control" placeholder="name" type="text">
+            </div>
+            <div class="form-group input-group">
+                <input name="image" class="form-control" placeholder="imageURL" type="text">
+            </div>
+            <div class="form-group input-group">
+                <input name="description" class="form-control" placeholder="description" type="text">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">Add</button>
+            </div>
+        </div>
+    </form>
+</article>
+
+<% include ../partials/footer %>

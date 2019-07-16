@@ -1,0 +1,18 @@
+<% include ../partials/header %>
+
+<article class="card-body mx-auto" style="max-width: 400px;">
+    <h4 class="card-title mt-3 text-center">Edit Comment</h4>
+
+    <form action="/campgrounds/<%= campground_id %>/comments/<%= comment._id %>?_method=PUT" method="POST">
+        <div class="card bg-light">
+            <div class="form-group input-group">
+                <input name="comment[text]" class="form-control" value="<%= comment.text %>" type="text">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            </div>
+        </div>
+    </form>
+</article>
+
+<% include ../partials/footer %>

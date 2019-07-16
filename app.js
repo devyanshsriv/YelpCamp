@@ -1,42 +1,57 @@
 var express = require("express"),
     app = express(),
-    bodyParser = require("body-parser");
+    bodyParser = require("body-parser"),
+    mongoose = require("mongoose"),
+    methodOverride = require("method-override"),
+    flash = require("connect-flash"),
+    passport = require("passport"),
+    LocalStrategy = require("passport-local");
 
+var User = require("./models/user"),
+    seedsDB = require("./seeds");
+
+var campgroundRoutes = require("./routes/campgroundRoutes"),
+    commentRoutes = require("./routes/commentRoutes"),
+    authRoutes = require("./routes/authRoutes");
+
+// seedsDB(); 
+mongoose.connect("mongodb+srv://devSriv22:dev1996@@localcluster-84ofl.mongodb.net/yelpcamp?retryWrites=true&w=majority", {useNewUrlParser: true});
 app.set("view engine", "ejs");
+mongoose.set('useFindAndModify', false);
 app.use(bodyParser.urlencoded({extended : true}));
+app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
+app.use(flash());
 
-//Array of Campgrounds
-var campgrounds = [
-    {name: "Salmon Creek", image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=60"},
-    {name: "Granite Hill", image: "https://images.unsplash.com/photo-1526491109672-74740652b963?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=60"},
-    {name: "Mountain Goat's Rest", image: "https://images.unsplash.com/photo-1510312305653-8ed496efae75?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=60"}
-];
+//=========================
+//PASSPORT CONFIGURATION
+//=========================
+
+app.use(require("express-session")({
+    secret: "My name is Devyansh",
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use(function(req, res, next) {
+    res.locals.currentUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
+    next();
+})
+
+app.use(campgroundRoutes);
+app.use(commentRoutes);
+app.use(authRoutes);
 
 //Home Page
 app.get('/', (req, res) => {
     res.render("landing");
-})
-
-//All Campgrounds Page
-app.get('/campgrounds', (req, res) => {
-    res.render("campgrounds", {campgrounds:campgrounds});
-})
-
-//Sending data to add new campground
-app.post('/campgrounds', (req, res) => {
-    //get data from form and add to campgrounds array
-    var name = req.body.name;
-    var image = req.body.image;
-    var newCampground = {name:name, image:image}
-    campgrounds.push(newCampground);
-    
-    //redirect back to campgrounds page
-    res.redirect("/campgrounds");
-})
-
-//Form to add new campground
-app.get('/campgrounds/new', (req, res) => {
-    res.render("newCampgroundForm");
 })
 
 app.listen(8000, function(){
